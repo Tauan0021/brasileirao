@@ -17,11 +17,6 @@ def process_data(df):
 
     vencedores = df['vencedor'].value_counts()
 
-    perdedores_mandante = df[df['vencedor'] != '-'].groupby('visitante').size()
-    perdedores_visitante = df[df['vencedor'] != '-'].groupby('mandante').size()
-    perdedores = perdedores_mandante.add(perdedores_visitante, fill_value=0).sort_values(ascending=False)
-
-    # Atualizando o cálculo das derrotas
     derrotas_mandante = df[df['vencedor'] != '-'][df['vencedor'] != df['mandante']].groupby('mandante').size()
     derrotas_visitante = df[df['vencedor'] != '-'][df['vencedor'] != df['visitante']].groupby('visitante').size()
     derrotas = derrotas_mandante.add(derrotas_visitante, fill_value=0).sort_values(ascending=False)
@@ -44,7 +39,7 @@ def process_data(df):
     pontos_empates = pontos_empates_mandante.add(pontos_empates_visitante, fill_value=0)
     pontos = pontos_vitorias.add(pontos_empates, fill_value=0).sort_values(ascending=False)
 
-    return jogos, vencedores, perdedores, derrotas, gols_feitos, gols_levados, empates, pontos
+    return jogos, vencedores, derrotas, gols_feitos, gols_levados, empates, pontos
 
 # Função para criar gráficos com Plotly
 def plot_graph(data, title):
@@ -54,7 +49,7 @@ def plot_graph(data, title):
     st.plotly_chart(fig)
 
 # Função para criar a tabela consolidada
-def create_consolidated_table(jogos, vencedores, perdedores, derrotas, gols_feitos, gols_levados, empates, pontos):
+def create_consolidated_table(jogos, vencedores, derrotas, gols_feitos, gols_levados, empates, pontos):
     tabela = pd.DataFrame({
         'Jogos': jogos,
         'Vitórias': vencedores,
@@ -71,7 +66,7 @@ def create_consolidated_table(jogos, vencedores, perdedores, derrotas, gols_feit
     return tabela
 
 # Função para criar o quadro de honra
-def create_hall_of_fame(df):
+def create_hall_of_fame():
     campeoes_wikipedia = {
         1959: "Bahia", 1960: "Palmeiras", 1961: "Santos", 1962: "Santos", 1963: "Santos", 1964: "Santos",
         1965: "Santos", 1966: "Cruzeiro", 1967: "Palmeiras", 1968: "Botafogo", 1969: "Palmeiras", 1970: "Fluminense",
@@ -110,10 +105,10 @@ with aba_selecionada[0]:
     dados_ano = tabela_limpa[tabela_limpa['data'].str.endswith(ano_selecionado)]
 
     # Processar dados para o ano selecionado
-    jogos, vencedores, perdedores, derrotas, gols_feitos, gols_levados, empates, pontos = process_data(dados_ano)
+    jogos, vencedores, derrotas, gols_feitos, gols_levados, empates, pontos = process_data(dados_ano)
 
     # Criar tabela consolidada para o ano selecionado
-    tabela_consolidada_ano = create_consolidated_table(jogos, vencedores, perdedores, derrotas, gols_feitos, gols_levados, empates, pontos)
+    tabela_consolidada_ano = create_consolidated_table(jogos, vencedores, derrotas, gols_feitos, gols_levados, empates, pontos)
 
     # Exibir tabela
     st.header(f"Estatísticas do Ano {ano_selecionado}")
@@ -134,10 +129,10 @@ with aba_selecionada[0]:
 
 with aba_selecionada[1]:
     # Processar dados para todos os anos
-    jogos, vencedores, perdedores, derrotas, gols_feitos, gols_levados, empates, pontos = process_data(tabela_limpa)
+    jogos, vencedores, derrotas, gols_feitos, gols_levados, empates, pontos = process_data(tabela_limpa)
 
     # Criar tabela consolidada para todos os anos
-    tabela_consolidada_geral = create_consolidated_table(jogos, vencedores, perdedores, derrotas, gols_feitos, gols_levados, empates, pontos)
+    tabela_consolidada_geral = create_consolidated_table(jogos, vencedores, derrotas, gols_feitos, gols_levados, empates, pontos)
 
     # Exibir tabela
     st.header("Estatísticas Gerais")
@@ -160,7 +155,7 @@ with aba_selecionada[1]:
 with aba_selecionada[2]:
     # Criar o quadro de honra
     st.header("Quadro de Honra")
-    campeoes = create_hall_of_fame(tabela_limpa)
+    campeoes = create_hall_of_fame()
     
     # Exibir tabela
     st.subheader("Times com mais Títulos desde 1959")
